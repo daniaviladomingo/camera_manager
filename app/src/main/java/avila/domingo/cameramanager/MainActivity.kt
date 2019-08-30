@@ -7,9 +7,11 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import avila.domingo.camera.CameraImp
 import avila.domingo.camera.CameraRotationUtil
+import avila.domingo.camera.NativeCamera
 import avila.domingo.camera.model.mapper.CameraSideMapper
 import avila.domingo.cameramanager.model.mapper.ImageMapper
 import avila.domingo.domain.model.CameraSide
+import avila.domingo.flash.FlashImp
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_main.*
@@ -20,22 +22,27 @@ class MainActivity : AppCompatActivity() {
 
     private val disposable = CompositeDisposable()
 
+    private var cameraSide = CameraSide.FRONT
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         val imageMapper = ImageMapper()
+        val cameraSideMapper = CameraSideMapper()
 
         val windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        val cameraSideMapper = CameraSideMapper()
         val cameraRotationUtil = CameraRotationUtil(windowManager, cameraSideMapper)
         val configureCamera = ConfigureCameraImp(cameraRotationUtil)
+        val nativeCamera = NativeCamera(configureCamera, cameraSideMapper)
+
+        val flash = FlashImp(nativeCamera)
+
         val camera = CameraImp(
-            configureCamera,
+            nativeCamera,
             cameraRotationUtil,
             surfaceView,
-            cameraSideMapper,
-            CameraSide.FRONT,
+            cameraSide,
             this.lifecycle
         )
 
@@ -53,7 +60,14 @@ class MainActivity : AppCompatActivity() {
         switch_camera.setOnClickListener {
             addDisposable(
                 camera
-                    .switchCamera(CameraSide.BACK)
+                    .switchCamera(
+                        when (cameraSide) {
+                            CameraSide.FRONT -> CameraSide.BACK
+                            CameraSide.BACK -> CameraSide.FRONT
+                        }.apply {
+                            cameraSide = this
+                        }
+                    )
                     .subscribe({
                         Log.d(tag, "Camera Switched!!")
                     }) {
@@ -70,21 +84,10 @@ class MainActivity : AppCompatActivity() {
                     }) {
                         Log.d(tag, it.localizedMessage)
                     })
-
-//            addDisposable(
-//                Observable
-//                    .interval(1000 / 7L, TimeUnit.MILLISECONDS)
-//                    .subscribeOn(Schedulers.io())
-//                    .flatMap { camera.takePreview().toObservable().map { imageMapper.map(it) } }
-//                    .subscribe({
-//                        image.setImageBitmap(it)
-//                    }) {
-//                        Log.d(tag, it.localizedMessage)
-//                    })
         }
 
         flash_on.setOnClickListener {
-            addDisposable(camera
+            addDisposable(flash
                 .on()
                 .subscribe({
                     Log.d(tag, "FLASH ON")
@@ -94,7 +97,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         flash_off.setOnClickListener {
-            addDisposable(camera
+            addDisposable(flash
                 .off()
                 .subscribe({
                     Log.d(tag, "FLASH OFF")
