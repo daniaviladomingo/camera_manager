@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
 
         val windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val cameraRotationUtil = CameraRotationUtil(windowManager, cameraSideMapper)
-        val configureCamera = ConfigureCameraImp(cameraRotationUtil)
+        val configureCamera = ConfigureCameraImp(windowManager, cameraRotationUtil)
         val nativeCamera = NativeCamera(configureCamera, cameraSideMapper)
 
         val flash = FlashImp(nativeCamera)
