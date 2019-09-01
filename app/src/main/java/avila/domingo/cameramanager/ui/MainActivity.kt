@@ -1,24 +1,28 @@
-package avila.domingo.cameramanager
+package avila.domingo.cameramanager.ui
 
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
-import androidx.appcompat.app.AppCompatActivity
 import avila.domingo.camera.CameraImp
 import avila.domingo.camera.CameraRotationUtil
 import avila.domingo.camera.NativeCamera
 import avila.domingo.camera.model.mapper.CameraSideMapper
+import avila.domingo.cameramanager.ConfigureCameraImp
+import avila.domingo.cameramanager.R
+import avila.domingo.cameramanager.base.BaseActivity
 import avila.domingo.cameramanager.model.mapper.ImageMapper
 import avila.domingo.domain.model.CameraSide
 import avila.domingo.flash.FlashImp
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_main.*
+import org.koin.android.viewmodel.ext.android.viewModel
 
-class MainActivity : AppCompatActivity() {
-
+class MainActivity : BaseActivity() {
     private val tag = this::class.java.name
+
+    private val mainActivityViewModel: MainActivityViewModel by viewModel()
+
 
     private val disposable = CompositeDisposable()
 
@@ -33,7 +37,8 @@ class MainActivity : AppCompatActivity() {
 
         val windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val cameraRotationUtil = CameraRotationUtil(windowManager, cameraSideMapper)
-        val configureCamera = ConfigureCameraImp(windowManager, cameraRotationUtil)
+        val configureCamera =
+            ConfigureCameraImp(windowManager, cameraRotationUtil)
         val nativeCamera = NativeCamera(configureCamera, cameraSideMapper)
 
         val flash = FlashImp(nativeCamera)
@@ -107,14 +112,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onStop() {
-        if (!disposable.isDisposed) {
-            disposable.clear()
-        }
-        super.onStop()
+    private fun setListener() {
+
     }
 
-    private fun addDisposable(d: Disposable) {
-        disposable.add(d)
-    }
+    override fun getLayoutId(): Int = R.layout.activity_main
+
+    override fun checkAgain(): () -> Unit = {}
+
+    override fun tryAgain(): () -> Unit = {}
 }
