@@ -1,17 +1,16 @@
 package avila.domingo.cameramanager.di
 
 import android.content.Context
-import android.util.Log
 import android.view.SurfaceView
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import avila.domingo.camera.CameraImp
 import avila.domingo.camera.CameraRotationUtil
-import avila.domingo.camera.IConfigureCamera
-import avila.domingo.camera.NativeCamera
+import avila.domingo.camera.config.IConfigureCamera
+import avila.domingo.camera.NativeCameraManager
 import avila.domingo.camera.model.mapper.CameraSideMapper
-import avila.domingo.cameramanager.ConfigureCameraImp
+import avila.domingo.camera.config.ConfigureCameraImp
 import avila.domingo.cameramanager.di.qualifiers.ForActivity
 import avila.domingo.cameramanager.di.qualifiers.ForApplication
 import avila.domingo.cameramanager.model.mapper.ImageMapper
@@ -41,9 +40,7 @@ val activityModule = module {
 }
 
 val viewModelModule = module {
-    viewModel {
-        Log.d("yyy", "Creo viewmodule")
-        MainActivityViewModel(get(), get(), get(), get(), get()/*, get(), get()*/) }
+    viewModel { MainActivityViewModel(get(), get(), get(), get(), get(), get(), get()) }
 }
 
 val useCaseModule = module {
@@ -55,13 +52,9 @@ val useCaseModule = module {
 }
 
 val cameraModule = module {
-    factory<ICamera> {
-        Log.d("yyy", "Creo Camera")
-        CameraImp(get(), get(), get(), get(), get())
-    }
+    factory<ICamera> { CameraImp(get(), get(), get(), get(), get()) }
 
     single {
-        Log.d("yyy", "Creo surface")
         SurfaceView(get()).apply {
             layoutParams =
                 ViewGroup.LayoutParams(
@@ -71,18 +64,23 @@ val cameraModule = module {
         }
     }
 
-    factory { NativeCamera(get(), get()) }
+    factory { NativeCameraManager(get(), get()) }
 
-    single<IConfigureCamera> { ConfigureCameraImp(get(), get()) }
+    single<IConfigureCamera> {
+        ConfigureCameraImp(
+            get(),
+            get()
+        )
+    }
 
     single { CameraRotationUtil(get(), get()) }
 
     single { CameraSide.BACK }
 }
 
-//val flashModule = module {
-//    factory<IFlash> { FlashImp(get()) }
-//}
+val flashModule = module {
+    factory<IFlash> { FlashImp(get()) }
+}
 
 val scheduleModule = module {
     single<IScheduleProvider> { ScheduleProviderImp() }

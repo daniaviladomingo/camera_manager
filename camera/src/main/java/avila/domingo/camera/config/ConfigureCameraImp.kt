@@ -1,12 +1,11 @@
 @file:Suppress("DEPRECATION")
 
-package avila.domingo.cameramanager
+package avila.domingo.camera.config
 
 import android.graphics.Point
 import android.hardware.Camera
 import android.view.WindowManager
 import avila.domingo.camera.CameraRotationUtil
-import avila.domingo.camera.IConfigureCamera
 import avila.domingo.domain.model.CameraSide
 import kotlin.math.abs
 

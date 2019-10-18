@@ -1,6 +1,6 @@
 @file:Suppress("DEPRECATION")
 
-package avila.domingo.camera
+package avila.domingo.camera.config
 
 import android.hardware.Camera
 import avila.domingo.domain.model.CameraSide

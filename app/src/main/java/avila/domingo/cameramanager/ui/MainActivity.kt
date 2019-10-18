@@ -21,7 +21,7 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        //setListener()
+        setListener()
 
         take_picture.setOnClickListener {
             mainActivityViewModel.takePicture()
@@ -40,13 +40,13 @@ class MainActivity : BaseActivity() {
             })
         }
 
-//        flash_on.setOnClickListener {
-//            mainActivityViewModel.flashOn()
-//        }
-//
-//        flash_off.setOnClickListener {
-//            mainActivityViewModel.flashOff()
-//        }
+        flash_on.setOnClickListener {
+            mainActivityViewModel.flashOn()
+        }
+
+        flash_off.setOnClickListener {
+            mainActivityViewModel.flashOff()
+        }
 
     }
 

@@ -8,11 +8,10 @@ import avila.domingo.cameramanager.ui.data.Resource
 import avila.domingo.cameramanager.util.SingleLiveEvent
 import avila.domingo.domain.interactor.*
 import avila.domingo.domain.model.CameraSide
-import avila.domingo.domain.model.Image
 
 class MainActivityViewModel(
-//    private val flashOnUseCase: FlashOnUseCase,
-//    private val flashOffUseCase: FlashOffUseCase,
+    private val flashOnUseCase: FlashOnUseCase,
+    private val flashOffUseCase: FlashOffUseCase,
     private val takePictureImageUseCase: TakePictureImageUseCase,
     private val takePreviewImageUseCase: TakePreviewImageUseCase,
     private val switchCameraUseCase: SwitchCameraUseCase,
@@ -57,26 +56,26 @@ class MainActivityViewModel(
             })
     }
 
-//    fun flashOn() {
-//        addDisposable(flashOnUseCase.execute()
-//            .observeOn(scheduleProvider.ui())
-//            .subscribeOn(scheduleProvider.computation())
-//            .subscribe({
-//                flashLiveData.value = Resource.success(null)
-//            }) {
-//                flashLiveData.value = Resource.error(it.localizedMessage)
-//            })
-//    }
-//
-//    fun flashOff() {
-//        addDisposable(flashOffUseCase.execute()
-//            .observeOn(scheduleProvider.ui())
-//            .subscribeOn(scheduleProvider.computation())
-//            .subscribe({
-//                flashLiveData.value = Resource.success(null)
-//            }) {
-//                flashLiveData.value = Resource.error(it.localizedMessage)
-//            })
-//    }
+    fun flashOn() {
+        addDisposable(flashOnUseCase.execute()
+            .observeOn(scheduleProvider.ui())
+            .subscribeOn(scheduleProvider.computation())
+            .subscribe({
+                flashLiveData.value = Resource.success(null)
+            }) {
+                flashLiveData.value = Resource.error(it.localizedMessage)
+            })
+    }
+
+    fun flashOff() {
+        addDisposable(flashOffUseCase.execute()
+            .observeOn(scheduleProvider.ui())
+            .subscribeOn(scheduleProvider.computation())
+            .subscribe({
+                flashLiveData.value = Resource.success(null)
+            }) {
+                flashLiveData.value = Resource.error(it.localizedMessage)
+            })
+    }
 
 }
