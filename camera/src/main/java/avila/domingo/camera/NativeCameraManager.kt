@@ -4,12 +4,13 @@ package avila.domingo.camera
 
 import android.hardware.Camera
 import avila.domingo.camera.config.IConfigureCamera
+import avila.domingo.camera.model.mapper.CameraSideMapper
 import avila.domingo.domain.model.CameraSide
 import avila.domingo.domain.model.mapper.Mapper
 
 class NativeCameraManager(
     private val configureCamera: IConfigureCamera,
-    private val cameraSideMapper: Mapper<CameraSide, Int>
+    private val cameraSideMapper: CameraSideMapper
 ) {
     private lateinit var currentCamera: Camera
     private lateinit var currentCameraSide: CameraSide

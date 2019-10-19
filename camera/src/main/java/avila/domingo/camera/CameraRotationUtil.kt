@@ -6,12 +6,12 @@ import android.hardware.Camera
 import android.util.Log
 import android.view.Surface
 import android.view.WindowManager
+import avila.domingo.camera.model.mapper.CameraSideMapper
 import avila.domingo.domain.model.CameraSide
-import avila.domingo.domain.model.mapper.Mapper
 
 class CameraRotationUtil(
     private val windowManager: WindowManager,
-    private val cameraSideMapper: Mapper<CameraSide, Int>
+    private val cameraSideMapper: CameraSideMapper
 ) {
     fun rotationDegrees(cameraSide: CameraSide): Int {
         val cameraInfo = Camera.CameraInfo()

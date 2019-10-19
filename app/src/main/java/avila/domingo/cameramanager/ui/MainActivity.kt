@@ -28,30 +28,30 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
 
-//        take_picture.setOnClickListener {
-//            mainActivityViewModel.takePicture()
-//        }
+        take_picture.setOnClickListener {
+            mainActivityViewModel.takePicture()
+        }
 
-//        take_preview.setOnClickListener {
-//            mainActivityViewModel.takePreview()
-//        }
+        take_preview.setOnClickListener {
+            mainActivityViewModel.takePreview()
+        }
 
-//        switch_camera.setOnClickListener {
-//            mainActivityViewModel.switchCamera(when (cameraSide) {
-//                CameraSide.FRONT -> CameraSide.BACK
-//                CameraSide.BACK -> CameraSide.FRONT
-//            }.apply {
-//                cameraSide = this
-//            })
-//        }
+        switch_camera.setOnClickListener {
+            mainActivityViewModel.switchCamera(when (cameraSide) {
+                CameraSide.FRONT -> CameraSide.BACK
+                CameraSide.BACK -> CameraSide.FRONT
+            }.apply {
+                cameraSide = this
+            })
+        }
 
-//        flash_on.setOnClickListener {
-//            mainActivityViewModel.flashOn()
-//        }
-//
-//        flash_off.setOnClickListener {
-//            mainActivityViewModel.flashOff()
-//        }
+        flash_on.setOnClickListener {
+            mainActivityViewModel.flashOn()
+        }
+
+        flash_off.setOnClickListener {
+            mainActivityViewModel.flashOff()
+        }
 
         if (isPermissionGranted(Manifest.permission.CAMERA)) {
             setListener()

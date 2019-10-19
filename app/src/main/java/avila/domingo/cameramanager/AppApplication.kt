@@ -18,7 +18,7 @@ class AppApplication : Application() {
                 viewModelModule,
                 useCaseModule,
                 cameraModule,
-//                flashModule,
+                flashModule,
                 scheduleModule,
                 mapperModule
             )
