@@ -40,15 +40,15 @@ val activityModule = module {
 }
 
 val viewModelModule = module {
-    viewModel { MainActivityViewModel(get(), get(), get(), get(), get(), get(), get()) }
+    viewModel { MainActivityViewModel(get(), get(), get()/*, get(), get(), get(), get()*/) }
 }
 
 val useCaseModule = module {
-    factory { FlashOffUseCase(get()) }
-    factory { FlashOnUseCase(get()) }
-    factory { SwitchCameraUseCase(get()) }
-    factory { TakePictureImageUseCase(get()) }
+//    factory { FlashOffUseCase(get()) }
+//    factory { FlashOnUseCase(get()) }
     factory { TakePreviewImageUseCase(get()) }
+//    factory { SwitchCameraUseCase(get()) }
+//    factory { TakePictureImageUseCase(get()) }
 }
 
 val cameraModule = module {
@@ -78,9 +78,9 @@ val cameraModule = module {
     single { CameraSide.BACK }
 }
 
-val flashModule = module {
-    factory<IFlash> { FlashImp(get()) }
-}
+//val flashModule = module {
+//    factory<IFlash> { FlashImp(get()) }
+//}
 
 val scheduleModule = module {
     single<IScheduleProvider> { ScheduleProviderImp() }
