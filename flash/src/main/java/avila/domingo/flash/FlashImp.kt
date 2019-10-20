@@ -3,11 +3,11 @@
 package avila.domingo.flash
 
 import android.hardware.Camera
-import avila.domingo.camera.NativeCameraManager
+import avila.domingo.camera.INativeCamera
 import avila.domingo.domain.IFlash
 import io.reactivex.Completable
 
-class FlashImp(private val nativeCameraManager: NativeCameraManager) : IFlash {
+class FlashImp(private val camera: INativeCamera) : IFlash {
     override fun on(): Completable = Completable.create {
         action("ON")
         it.onComplete()
@@ -19,7 +19,7 @@ class FlashImp(private val nativeCameraManager: NativeCameraManager) : IFlash {
     }
 
     private fun action(action: String) {
-        nativeCameraManager.getCurrentCamera().run {
+        camera.camera().run {
             val customParameters = parameters
 
             customParameters.flashMode = when (action) {

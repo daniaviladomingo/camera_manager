@@ -7,10 +7,10 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import avila.domingo.camera.CameraImp
 import avila.domingo.camera.CameraRotationUtil
-import avila.domingo.camera.config.IConfigureCamera
 import avila.domingo.camera.NativeCameraManager
-import avila.domingo.camera.model.mapper.CameraSideMapper
 import avila.domingo.camera.config.ConfigureCameraImp
+import avila.domingo.camera.config.IConfigureCamera
+import avila.domingo.camera.model.mapper.CameraSideMapper
 import avila.domingo.cameramanager.di.qualifiers.ForActivity
 import avila.domingo.cameramanager.di.qualifiers.ForApplication
 import avila.domingo.cameramanager.model.mapper.ImageMapper
@@ -35,7 +35,7 @@ val activityModule = module {
     lateinit var activityReference: AppCompatActivity
     factory { (activity: AppCompatActivity) -> activityReference = activity }
     factory<Context>(ForActivity) { activityReference }
-    factory { activityReference.lifecycle }
+    factory { { activityReference.lifecycle } }
 
 }
 
@@ -44,11 +44,11 @@ val viewModelModule = module {
 }
 
 val useCaseModule = module {
-    factory { FlashOffUseCase(get()) }
-    factory { FlashOnUseCase(get()) }
-    factory { TakePreviewImageUseCase(get()) }
-    factory { SwitchCameraUseCase(get()) }
-    factory { TakePictureImageUseCase(get()) }
+    single { FlashOffUseCase(get()) }
+    single { FlashOnUseCase(get()) }
+    single { TakePreviewImageUseCase(get()) }
+    single { SwitchCameraUseCase(get()) }
+    single { TakePictureImageUseCase(get()) }
 }
 
 val cameraModule = module {
@@ -64,7 +64,7 @@ val cameraModule = module {
         }
     }
 
-    single { NativeCameraManager(get(), get()) }
+    single { NativeCameraManager(get(), get(), get()) }
 
     single<IConfigureCamera> {
         ConfigureCameraImp(
@@ -73,13 +73,13 @@ val cameraModule = module {
         )
     }
 
-    single { CameraRotationUtil(get(), get()) }
+    single { CameraRotationUtil(get(), get(), get()) }
 
     single { CameraSide.BACK }
 }
 
 val flashModule = module {
-    factory<IFlash> { FlashImp(get()) }
+    single<IFlash> { FlashImp(get()) }
 }
 
 val scheduleModule = module {

@@ -7,7 +7,6 @@ import avila.domingo.cameramanager.schedulers.IScheduleProvider
 import avila.domingo.cameramanager.ui.data.Resource
 import avila.domingo.cameramanager.util.SingleLiveEvent
 import avila.domingo.domain.interactor.*
-import avila.domingo.domain.model.CameraSide
 
 class MainActivityViewModel(
     private val flashOnUseCase: FlashOnUseCase,
@@ -45,8 +44,8 @@ class MainActivityViewModel(
             })
     }
 
-    fun switchCamera(cameraSide: CameraSide) {
-        addDisposable(switchCameraUseCase.execute(cameraSide)
+    fun switchCamera() {
+        addDisposable(switchCameraUseCase.execute()
             .observeOn(scheduleProvider.ui())
             .subscribeOn(scheduleProvider.computation())
             .subscribe({

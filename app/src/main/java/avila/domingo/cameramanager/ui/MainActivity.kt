@@ -10,7 +10,6 @@ import avila.domingo.cameramanager.ui.data.ResourceState
 import avila.domingo.cameramanager.util.extension.isPermissionGranted
 import avila.domingo.cameramanager.util.extension.isPermissionsGranted
 import avila.domingo.cameramanager.util.extension.requestPermission
-import avila.domingo.domain.model.CameraSide
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
@@ -21,8 +20,6 @@ class MainActivity : BaseActivity() {
     private val surfaceView: SurfaceView by inject()
 
     private val mainActivityViewModel: MainActivityViewModel by viewModel()
-
-    private var cameraSide = CameraSide.FRONT
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,12 +34,7 @@ class MainActivity : BaseActivity() {
         }
 
         switch_camera.setOnClickListener {
-            mainActivityViewModel.switchCamera(when (cameraSide) {
-                CameraSide.FRONT -> CameraSide.BACK
-                CameraSide.BACK -> CameraSide.FRONT
-            }.apply {
-                cameraSide = this
-            })
+            mainActivityViewModel.switchCamera()
         }
 
         flash_on.setOnClickListener {
