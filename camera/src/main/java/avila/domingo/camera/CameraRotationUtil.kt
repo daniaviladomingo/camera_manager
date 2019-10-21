@@ -3,7 +3,6 @@
 package avila.domingo.camera
 
 import android.hardware.Camera
-import android.util.Log
 import android.view.Surface
 import android.view.WindowManager
 import avila.domingo.camera.model.mapper.CameraSideMapper
@@ -31,6 +30,4 @@ class CameraRotationUtil(
 
         return (cameraInfo.orientation + degrees) % 360
     }
-
-
 }

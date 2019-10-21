@@ -109,7 +109,7 @@ val cameraModule = module {
 }
 
 val flashModule = module {
-    factory<IFlash> { FlashImp(get()) }
+    single<IFlash> { FlashImp(get()) }
 }
 
 val scheduleModule = module {
