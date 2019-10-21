@@ -32,13 +32,5 @@ class CameraRotationUtil(
         return (cameraInfo.orientation + degrees) % 360
     }
 
-    fun rotationDegreesSurface(): Int = when (windowManager.defaultDisplay.rotation) {
-        Surface.ROTATION_0 -> 90
-        Surface.ROTATION_90 -> 0
-        Surface.ROTATION_180 -> 90
-        Surface.ROTATION_270 -> 180
-        else -> 0
-    }.apply {
-        Log.d("xxxx", "${windowManager.defaultDisplay.rotation}")
-    }
+
 }

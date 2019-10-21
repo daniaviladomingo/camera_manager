@@ -5,14 +5,12 @@ import android.view.SurfaceView
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
-import avila.domingo.camera.CameraImp
-import avila.domingo.camera.CameraRotationUtil
-import avila.domingo.camera.NativeCameraManager
-import avila.domingo.camera.config.ConfigureCameraImp
-import avila.domingo.camera.config.IConfigureCamera
+import avila.domingo.camera.*
 import avila.domingo.camera.model.mapper.CameraSideMapper
 import avila.domingo.cameramanager.di.qualifiers.ForActivity
 import avila.domingo.cameramanager.di.qualifiers.ForApplication
+import avila.domingo.cameramanager.di.qualifiers.RangeForPicture
+import avila.domingo.cameramanager.di.qualifiers.RangeForPreview
 import avila.domingo.cameramanager.model.mapper.ImageMapper
 import avila.domingo.cameramanager.schedulers.IScheduleProvider
 import avila.domingo.cameramanager.schedulers.ScheduleProviderImp
@@ -36,7 +34,6 @@ val activityModule = module {
     factory { (activity: AppCompatActivity) -> activityReference = activity }
     factory<Context>(ForActivity) { activityReference }
     factory { { activityReference.lifecycle } }
-
 }
 
 val viewModelModule = module {
@@ -44,15 +41,17 @@ val viewModelModule = module {
 }
 
 val useCaseModule = module {
-    single { FlashOffUseCase(get()) }
-    single { FlashOnUseCase(get()) }
-    single { TakePreviewImageUseCase(get()) }
-    single { SwitchCameraUseCase(get()) }
-    single { TakePictureImageUseCase(get()) }
+    factory { FlashOffUseCase(get()) }
+    factory { FlashOnUseCase(get()) }
+    factory { TakePreviewImageUseCase(get()) }
+    factory { SwitchCameraUseCase(get()) }
+    factory { TakePictureImageUseCase(get()) }
 }
 
 val cameraModule = module {
-    single<ICamera> { CameraImp(get(), get(), get(), get(), get()) }
+    var nativeCameraManager: NativeCameraManager? = null
+
+    factory<ICamera> { CameraImp(get(), get(), get(), get(), get()) }
 
     single {
         SurfaceView(get()).apply {
@@ -64,22 +63,53 @@ val cameraModule = module {
         }
     }
 
-    single { NativeCameraManager(get(), get(), get()) }
-
-    single<IConfigureCamera> {
-        ConfigureCameraImp(
+    single<ICameraSide> {
+        nativeCameraManager ?: NativeCameraManager(
             get(),
+            get(),
+            get(RangeForPreview),
+            get(RangeForPicture),
             get()
-        )
+        ).apply {
+            nativeCameraManager = this
+        }
+    }
+
+    single<ISwitchCamera> {
+        nativeCameraManager ?: NativeCameraManager(
+            get(),
+            get(),
+            get(RangeForPreview),
+            get(RangeForPicture),
+            get()
+        ).apply {
+            nativeCameraManager = this
+        }
+    }
+
+    single<INativeCamera> {
+        nativeCameraManager ?: NativeCameraManager(
+            get(),
+            get(),
+            get(RangeForPreview),
+            get(RangeForPicture),
+            get()
+        ).apply {
+            nativeCameraManager = this
+        }
     }
 
     single { CameraRotationUtil(get(), get(), get()) }
 
     single { CameraSide.BACK }
+
+    single(RangeForPicture) { 640..2160 }
+
+    single(RangeForPreview) { 640..2160 }
 }
 
 val flashModule = module {
-    single<IFlash> { FlashImp(get()) }
+    factory<IFlash> { FlashImp(get()) }
 }
 
 val scheduleModule = module {

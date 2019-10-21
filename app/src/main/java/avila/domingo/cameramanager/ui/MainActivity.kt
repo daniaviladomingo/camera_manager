@@ -24,7 +24,6 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
         take_picture.setOnClickListener {
             mainActivityViewModel.takePicture()
         }
