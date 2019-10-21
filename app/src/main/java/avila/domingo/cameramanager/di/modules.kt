@@ -51,7 +51,7 @@ val useCaseModule = module {
 val cameraModule = module {
     var nativeCameraManager: NativeCameraManager? = null
 
-    single <ICamera> { CameraImp(get(), get(), get()) }
+    factory <ICamera> { CameraImp(get(), get(), get()) }
 
     single {
         SurfaceView(get()).apply {
@@ -63,7 +63,7 @@ val cameraModule = module {
         }
     }
 
-    single<ICameraSide> {
+    factory<ICameraSide> {
         nativeCameraManager ?: NativeCameraManager(
             get(),
             get(),
@@ -77,7 +77,7 @@ val cameraModule = module {
         }
     }
 
-    single<ISwitchCamera> {
+    factory<ISwitchCamera> {
         nativeCameraManager ?: NativeCameraManager(
             get(),
             get(),
@@ -91,7 +91,7 @@ val cameraModule = module {
         }
     }
 
-    single<INativeCamera> {
+    factory<INativeCamera> {
         nativeCameraManager ?: NativeCameraManager(
             get(),
             get(),
@@ -115,7 +115,7 @@ val cameraModule = module {
 }
 
 val flashModule = module {
-    single<IFlash> { FlashImp(get()) }
+    factory<IFlash> { FlashImp(get()) }
 }
 
 val scheduleModule = module {
