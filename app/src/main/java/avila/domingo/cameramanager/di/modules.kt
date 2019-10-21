@@ -51,7 +51,7 @@ val useCaseModule = module {
 val cameraModule = module {
     var nativeCameraManager: NativeCameraManager? = null
 
-    factory<ICamera> { CameraImp(get(), get(), get()) }
+    single <ICamera> { CameraImp(get(), get(), get()) }
 
     single {
         SurfaceView(get()).apply {
