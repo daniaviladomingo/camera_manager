@@ -5,7 +5,12 @@ package avila.domingo.camera
 import android.graphics.Point
 import android.hardware.Camera
 import android.view.Surface
+import android.view.SurfaceHolder
+import android.view.SurfaceView
 import android.view.WindowManager
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
 import avila.domingo.camera.model.mapper.CameraSideMapper
 import avila.domingo.domain.model.CameraSide
 import kotlin.math.abs
@@ -15,13 +20,33 @@ class NativeCameraManager(
     private val windowManager: WindowManager,
     private val rangePreview: IntRange,
     private val rangePicture: IntRange,
-    initialCameraSide: CameraSide
-) : INativeCamera, ISwitchCamera, ICameraSide {
+    private val surfaceView: SurfaceView,
+    private val initialCameraSide: CameraSide,
+    lifecycle: () -> Lifecycle // Esto es simplemente para start/stop la preview cuando la activity sale/entre en segundo plano
+) : INativeCamera, ISwitchCamera, ICameraSide, LifecycleObserver {
+
     private lateinit var currentCamera: Camera
     private var currentCameraSide = initialCameraSide
 
+    private val surfaceHolderCallback = object : SurfaceHolder.Callback {
+        override fun surfaceChanged(
+            holder: SurfaceHolder,
+            format: Int,
+            width: Int,
+            height: Int
+        ) {
+        }
+
+        override fun surfaceDestroyed(holder: SurfaceHolder) {}
+
+        override fun surfaceCreated(holder: SurfaceHolder) {
+            currentCamera.setPreviewDisplay(holder)
+        }
+    }
+
     init {
-        openCamera(initialCameraSide)
+        lifecycle.invoke().addObserver(this)
+        surfaceView.holder.addCallback(surfaceHolderCallback)
     }
 
     override fun switch() {
@@ -32,6 +57,10 @@ class NativeCameraManager(
         }.apply {
             currentCameraSide = this
         })
+        currentCamera.run {
+            startPreview()
+            setPreviewDisplay(surfaceView.holder)
+        }
     }
 
     override fun cameraSide(): CameraSide = currentCameraSide
@@ -156,4 +185,23 @@ class NativeCameraManager(
         }
 
     internal data class Size(val witdh: Int, val height: Int)
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    fun start() {
+        openCamera(initialCameraSide)
+        currentCamera.setPreviewDisplay(surfaceView.holder)
+        currentCamera.startPreview()
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    fun stop() {
+        currentCamera.stopPreview()
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+    fun destroy() {
+        surfaceView.holder.removeCallback(surfaceHolderCallback)
+        currentCamera.stopPreview()
+        currentCamera.release()
+    }
 }
