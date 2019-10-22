@@ -11,6 +11,7 @@ import android.view.WindowManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
+import avila.domingo.android.ILifecycleUpdate
 import avila.domingo.camera.model.mapper.CameraSideMapper
 import avila.domingo.domain.model.CameraSide
 import kotlin.math.abs
@@ -21,9 +22,9 @@ class NativeCameraManager(
     private val rangePreview: IntRange,
     private val rangePicture: IntRange,
     private val surfaceView: SurfaceView,
-    private val initialCameraSide: CameraSide,
-    lifecycle: () -> Lifecycle // Esto es simplemente para start/stop la preview cuando la activity sale/entre en segundo plano
-) : INativeCamera, ISwitchCamera, ICameraSide, LifecycleObserver {
+    lifecycle: Lifecycle,
+    initialCameraSide: CameraSide
+) : INativeCamera, ISwitchCamera, ICameraSide, ILifecycleUpdate, LifecycleObserver {
 
     private lateinit var currentCamera: Camera
     private var currentCameraSide = initialCameraSide
@@ -45,8 +46,11 @@ class NativeCameraManager(
     }
 
     init {
-        lifecycle.invoke().addObserver(this)
-        surfaceView.holder.addCallback(surfaceHolderCallback)
+        lifecycle.addObserver(this)
+    }
+
+    override fun update(lifecycle: Lifecycle) {
+        lifecycle.addObserver(this)
     }
 
     override fun switch() {
@@ -188,7 +192,8 @@ class NativeCameraManager(
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun start() {
-        openCamera(initialCameraSide)
+        surfaceView.holder.addCallback(surfaceHolderCallback)
+        openCamera(currentCameraSide)
         currentCamera.setPreviewDisplay(surfaceView.holder)
         currentCamera.startPreview()
     }

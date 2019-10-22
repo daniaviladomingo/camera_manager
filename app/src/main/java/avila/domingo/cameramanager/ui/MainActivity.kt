@@ -12,7 +12,7 @@ import avila.domingo.cameramanager.util.extension.isPermissionsGranted
 import avila.domingo.cameramanager.util.extension.requestPermission
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.ext.android.viewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : BaseActivity() {
     private val requestCodeCamera = 1

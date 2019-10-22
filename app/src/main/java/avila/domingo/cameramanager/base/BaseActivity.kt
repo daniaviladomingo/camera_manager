@@ -1,17 +1,18 @@
 package avila.domingo.cameramanager.base
 
 import android.os.Bundle
+import android.view.Gravity
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import avila.domingo.cameramanager.R
 import avila.domingo.cameramanager.ui.data.ResourceState
 import kotlinx.android.synthetic.main.activity_base.*
-import kotlinx.android.synthetic.main.view_error.*
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 
@@ -21,9 +22,11 @@ abstract class BaseActivity : AppCompatActivity() {
 
     private lateinit var activityView: View
 
+    private var toast: Toast? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        fakeInject.apply {  }
+        fakeInject.run { }
 
         if (getLayoutId() == 0) {
             throw RuntimeException("Invalid Layout ID")
@@ -32,7 +35,10 @@ abstract class BaseActivity : AppCompatActivity() {
         setContentView(R.layout.activity_base)
 
         activityView = layoutInflater.inflate(getLayoutId(), null)
-        (view as FrameLayout).addView(activityView, LinearLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT))
+        (view as FrameLayout).addView(
+            activityView,
+            LinearLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT)
+        )
 
         view_empty.emptyListener = checkAgain()
         view_error.errorListener = tryAgain()
@@ -65,11 +71,16 @@ abstract class BaseActivity : AppCompatActivity() {
                 view_progress.visibility = GONE
             }
             ResourceState.ERROR -> {
-                view.visibility = GONE
-                view_error.visibility = VISIBLE
-                error_message.text = message ?: ""
-                view_empty.visibility = GONE
-                view_progress.visibility = GONE
+//                view.visibility = GONE
+//                view_error.visibility = VISIBLE
+//                error_message.text = message ?: ""
+//                view_empty.visibility = GONE
+//                view_progress.visibility = GONE
+                toast?.cancel()
+                toast = Toast.makeText(this, message, Toast.LENGTH_SHORT).apply {
+                    setGravity(Gravity.CENTER_VERTICAL, 0, 0)
+                    show()
+                }
             }
         }
     }

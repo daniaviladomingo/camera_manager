@@ -1,1 +1,1 @@
-include ':app', ':domain', ':camera', ':flash'
+include ':app', ':domain', ':camera', ':flash', ':android'

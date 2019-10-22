@@ -5,6 +5,7 @@ import android.view.SurfaceView
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
+import avila.domingo.android.ILifecycleUpdate
 import avila.domingo.camera.*
 import avila.domingo.camera.model.mapper.CameraSideMapper
 import avila.domingo.cameramanager.di.qualifiers.ForActivity
@@ -21,8 +22,11 @@ import avila.domingo.domain.interactor.*
 import avila.domingo.domain.model.CameraSide
 import avila.domingo.flash.FlashImp
 import org.koin.android.ext.koin.androidContext
-import org.koin.android.viewmodel.dsl.viewModel
+import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.dsl.binds
 import org.koin.dsl.module
+
+var nativeCameraManager: ILifecycleUpdate? = null
 
 val appModule = module {
     single(ForApplication) { androidContext() }
@@ -31,9 +35,16 @@ val appModule = module {
 
 val activityModule = module {
     lateinit var activityReference: AppCompatActivity
-    factory { (activity: AppCompatActivity) -> activityReference = activity }
+
+    factory { (activity: AppCompatActivity) ->
+        nativeCameraManager?.update(activity.lifecycle)
+        activityReference = activity
+        Unit
+    }
+
     factory<Context>(ForActivity) { activityReference }
-    factory { { activityReference.lifecycle } }
+
+    factory { activityReference.lifecycle }
 }
 
 val viewModelModule = module {
@@ -49,9 +60,7 @@ val useCaseModule = module {
 }
 
 val cameraModule = module {
-    var nativeCameraManager: NativeCameraManager? = null
-
-    factory <ICamera> { CameraImp(get(), get(), get()) }
+    factory<ICamera> { CameraImp(get(), get(), get()) }
 
     single {
         SurfaceView(get()).apply {
@@ -63,8 +72,8 @@ val cameraModule = module {
         }
     }
 
-    factory<ICameraSide> {
-        nativeCameraManager ?: NativeCameraManager(
+    single {
+        NativeCameraManager(
             get(),
             get(),
             get(RangeForPreview),
@@ -75,35 +84,12 @@ val cameraModule = module {
         ).apply {
             nativeCameraManager = this
         }
-    }
-
-    factory<ISwitchCamera> {
-        nativeCameraManager ?: NativeCameraManager(
-            get(),
-            get(),
-            get(RangeForPreview),
-            get(RangeForPicture),
-            get(),
-            get(),
-            get()
-        ).apply {
-            nativeCameraManager = this
-        }
-    }
-
-    factory<INativeCamera> {
-        nativeCameraManager ?: NativeCameraManager(
-            get(),
-            get(),
-            get(RangeForPreview),
-            get(RangeForPicture),
-            get(),
-            get(),
-            get()
-        ).apply {
-            nativeCameraManager = this
-        }
-    }
+    } binds arrayOf(
+        ICameraSide::class,
+        INativeCamera::class,
+        ISwitchCamera::class,
+        ILifecycleUpdate::class
+    )
 
     single { CameraRotationUtil(get(), get(), get()) }
 
