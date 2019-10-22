@@ -1,5 +1,5 @@
 # Camera Manager
-Management native android camera
+Management native android camera (Clean Architecture)
 
 - Take preview image
 - Take picture image
