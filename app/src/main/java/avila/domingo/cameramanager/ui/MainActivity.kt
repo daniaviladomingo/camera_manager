@@ -4,6 +4,7 @@ import android.Manifest
 import android.os.Bundle
 import android.view.SurfaceView
 import androidx.lifecycle.Observer
+import avila.domingo.android.LifecycleManager
 import avila.domingo.cameramanager.R
 import avila.domingo.cameramanager.base.BaseActivity
 import avila.domingo.cameramanager.ui.data.ResourceState
@@ -13,6 +14,7 @@ import avila.domingo.cameramanager.util.extension.requestPermission
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 
 class MainActivity : BaseActivity() {
     private val requestCodeCamera = 1
@@ -21,8 +23,12 @@ class MainActivity : BaseActivity() {
 
     private val mainActivityViewModel: MainActivityViewModel by viewModel()
 
+    private val lifecycleObserver: LifecycleManager by inject { parametersOf(this.lifecycle) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        lifecycleObserver.run { }
 
         take_picture.setOnClickListener {
             mainActivityViewModel.takePicture()

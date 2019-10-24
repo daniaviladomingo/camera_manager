@@ -2,6 +2,7 @@ package avila.domingo.cameramanager.ui
 
 import android.graphics.Bitmap
 import avila.domingo.cameramanager.base.BaseViewModel
+import avila.domingo.cameramanager.di.activityModule
 import avila.domingo.cameramanager.model.mapper.ImageMapper
 import avila.domingo.cameramanager.schedulers.IScheduleProvider
 import avila.domingo.cameramanager.ui.data.Resource

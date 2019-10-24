@@ -13,12 +13,8 @@ import androidx.appcompat.app.AppCompatActivity
 import avila.domingo.cameramanager.R
 import avila.domingo.cameramanager.ui.data.ResourceState
 import kotlinx.android.synthetic.main.activity_base.*
-import org.koin.android.ext.android.inject
-import org.koin.core.parameter.parametersOf
 
 abstract class BaseActivity : AppCompatActivity() {
-
-    private val fakeInject: Unit by inject { parametersOf(this) }
 
     private lateinit var activityView: View
 
@@ -26,7 +22,6 @@ abstract class BaseActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        fakeInject.run { }
 
         if (getLayoutId() == 0) {
             throw RuntimeException("Invalid Layout ID")

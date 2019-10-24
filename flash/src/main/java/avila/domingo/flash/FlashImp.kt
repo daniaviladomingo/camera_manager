@@ -20,14 +20,13 @@ class FlashImp(private val camera: INativeCamera) : IFlash {
 
     private fun action(action: String) {
         camera.camera().run {
-            val customParameters = parameters
-
-            customParameters.flashMode = when (action) {
-                "ON" -> Camera.Parameters.FLASH_MODE_TORCH
-                "OFF" -> Camera.Parameters.FLASH_MODE_OFF
-                else -> Camera.Parameters.FLASH_MODE_OFF
+            parameters = parameters.apply {
+                flashMode = when (action) {
+                    "ON" -> Camera.Parameters.FLASH_MODE_TORCH
+                    "OFF" -> Camera.Parameters.FLASH_MODE_OFF
+                    else -> Camera.Parameters.FLASH_MODE_OFF
+                }
             }
-            parameters = customParameters
         }
     }
 }

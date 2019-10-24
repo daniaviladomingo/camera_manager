@@ -8,10 +8,7 @@ import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.WindowManager
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
-import avila.domingo.android.ILifecycleUpdate
+import avila.domingo.android.ILifecycleObserver
 import avila.domingo.camera.model.mapper.CameraSideMapper
 import avila.domingo.domain.model.CameraSide
 import kotlin.math.abs
@@ -22,9 +19,8 @@ class NativeCameraManager(
     private val rangePreview: IntRange,
     private val rangePicture: IntRange,
     private val surfaceView: SurfaceView,
-    lifecycle: Lifecycle,
     initialCameraSide: CameraSide
-) : INativeCamera, ISwitchCamera, ICameraSide, ILifecycleUpdate, LifecycleObserver {
+) : INativeCamera, ISwitchCamera, ICameraSide, ILifecycleObserver {
 
     private lateinit var currentCamera: Camera
     private var currentCameraSide = initialCameraSide
@@ -43,14 +39,6 @@ class NativeCameraManager(
         override fun surfaceCreated(holder: SurfaceHolder) {
             currentCamera.setPreviewDisplay(holder)
         }
-    }
-
-    init {
-        lifecycle.addObserver(this)
-    }
-
-    override fun update(lifecycle: Lifecycle) {
-        lifecycle.addObserver(this)
     }
 
     override fun switch() {
@@ -190,21 +178,18 @@ class NativeCameraManager(
 
     internal data class Size(val witdh: Int, val height: Int)
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    fun start() {
+    override fun start() {
         surfaceView.holder.addCallback(surfaceHolderCallback)
         openCamera(currentCameraSide)
         currentCamera.setPreviewDisplay(surfaceView.holder)
         currentCamera.startPreview()
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    fun stop() {
+    override fun stop() {
         currentCamera.stopPreview()
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-    fun destroy() {
+    override fun destroy() {
         surfaceView.holder.removeCallback(surfaceHolderCallback)
         currentCamera.stopPreview()
         currentCamera.release()
