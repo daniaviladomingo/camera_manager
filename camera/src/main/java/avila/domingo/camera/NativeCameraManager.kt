@@ -19,7 +19,7 @@ class NativeCameraManager(
     private val rangePreview: IntRange,
     private val rangePicture: IntRange,
     private val surfaceView: SurfaceView,
-    initialCameraSide: CameraSide
+    private val initialCameraSide: CameraSide
 ) : INativeCamera, ISwitchCamera, ICameraSide, ILifecycleObserver {
 
     private lateinit var currentCamera: Camera
@@ -193,5 +193,6 @@ class NativeCameraManager(
         surfaceView.holder.removeCallback(surfaceHolderCallback)
         currentCamera.stopPreview()
         currentCamera.release()
+        currentCameraSide = initialCameraSide
     }
 }

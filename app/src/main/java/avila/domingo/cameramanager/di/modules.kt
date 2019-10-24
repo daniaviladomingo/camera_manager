@@ -9,7 +9,6 @@ import avila.domingo.android.ILifecycleObserver
 import avila.domingo.android.LifecycleManager
 import avila.domingo.camera.*
 import avila.domingo.camera.model.mapper.CameraSideMapper
-import avila.domingo.cameramanager.di.qualifiers.ForApplication
 import avila.domingo.cameramanager.di.qualifiers.RangeForPicture
 import avila.domingo.cameramanager.di.qualifiers.RangeForPreview
 import avila.domingo.cameramanager.model.mapper.ImageMapper
@@ -27,8 +26,7 @@ import org.koin.dsl.binds
 import org.koin.dsl.module
 
 val appModule = module {
-    single(ForApplication) { androidContext() }
-    single { (get(ForApplication) as Context).getSystemService(Context.WINDOW_SERVICE) as WindowManager }
+    single { androidContext().getSystemService(Context.WINDOW_SERVICE) as WindowManager }
 }
 
 val activityModule = module {
@@ -40,18 +38,18 @@ val viewModelModule = module {
 }
 
 val useCaseModule = module {
-    factory { FlashOffUseCase(get()) }
-    factory { FlashOnUseCase(get()) }
-    factory { TakePreviewImageUseCase(get()) }
-    factory { SwitchCameraUseCase(get()) }
-    factory { TakePictureImageUseCase(get()) }
+    single { FlashOffUseCase(get()) }
+    single { FlashOnUseCase(get()) }
+    single { TakePreviewImageUseCase(get()) }
+    single { SwitchCameraUseCase(get()) }
+    single { TakePictureImageUseCase(get()) }
 }
 
 val cameraModule = module {
-    factory<ICamera> { CameraImp(get(), get(), get()) }
+    single<ICamera> { CameraImp(get(), get(), get()) }
 
     single {
-        SurfaceView(get()).apply {
+        SurfaceView(androidContext()).apply {
             layoutParams =
                 ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
@@ -86,7 +84,7 @@ val cameraModule = module {
 }
 
 val flashModule = module {
-    factory<IFlash> { FlashImp(get()) }
+    single<IFlash> { FlashImp(get()) }
 }
 
 val scheduleModule = module {
