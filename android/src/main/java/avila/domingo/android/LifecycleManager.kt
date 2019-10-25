@@ -5,7 +5,7 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 
 class LifecycleManager(
-    private val lifecycleObserver: ILifecycleObserver,
+    private val lifecycleObserver: Array<ILifecycleObserver>,
     lifecycle: Lifecycle
 ) : LifecycleObserver {
     init {
@@ -14,16 +14,16 @@ class LifecycleManager(
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun start() {
-        lifecycleObserver.start()
+        lifecycleObserver.forEach { it.start() }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun stop() {
-        lifecycleObserver.stop()
+        lifecycleObserver.forEach { it.stop() }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun destroy() {
-        lifecycleObserver.destroy()
+        lifecycleObserver.forEach { it.destroy() }
     }
 }

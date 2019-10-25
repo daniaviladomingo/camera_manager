@@ -3,29 +3,47 @@
 package avila.domingo.flash
 
 import android.hardware.Camera
+import avila.domingo.android.ILifecycleObserver
 import avila.domingo.camera.INativeCamera
 import avila.domingo.domain.IFlash
 import io.reactivex.Completable
 
-class FlashImp(private val camera: INativeCamera) : IFlash {
+class FlashImp(private val camera: INativeCamera) : IFlash, ILifecycleObserver {
+    private var flashState = false
     override fun on(): Completable = Completable.create {
-        action("ON")
+        action(true)
         it.onComplete()
+        flashState = true
+
     }
 
     override fun off(): Completable = Completable.create {
-        action("OFF")
+        action(false)
         it.onComplete()
+        flashState = false
     }
 
-    private fun action(action: String) {
+    override fun start() {
+        if(flashState) {
+            action(true)
+        }
+    }
+
+    override fun stop() {
+        if(flashState) {
+            action(false)
+        }
+    }
+
+    override fun destroy() {
+        flashState = false
+    }
+
+    private fun action(flashState: Boolean) {
         camera.camera().run {
             parameters = parameters.apply {
-                flashMode = when (action) {
-                    "ON" -> Camera.Parameters.FLASH_MODE_TORCH
-                    "OFF" -> Camera.Parameters.FLASH_MODE_OFF
-                    else -> Camera.Parameters.FLASH_MODE_OFF
-                }
+                flashMode =
+                    if (flashState) Camera.Parameters.FLASH_MODE_TORCH else Camera.Parameters.FLASH_MODE_OFF
             }
         }
     }

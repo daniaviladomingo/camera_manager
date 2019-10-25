@@ -9,6 +9,8 @@ import avila.domingo.android.ILifecycleObserver
 import avila.domingo.android.LifecycleManager
 import avila.domingo.camera.*
 import avila.domingo.camera.model.mapper.CameraSideMapper
+import avila.domingo.cameramanager.di.qualifiers.Camera
+import avila.domingo.cameramanager.di.qualifiers.Flash
 import avila.domingo.cameramanager.di.qualifiers.RangeForPicture
 import avila.domingo.cameramanager.di.qualifiers.RangeForPreview
 import avila.domingo.cameramanager.model.mapper.ImageMapper
@@ -22,6 +24,7 @@ import avila.domingo.domain.model.CameraSide
 import avila.domingo.flash.FlashImp
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.dsl.bind
 import org.koin.dsl.binds
 import org.koin.dsl.module
 
@@ -31,7 +34,7 @@ val appModule = module {
 
 val activityModule = module {
     factory { (lifecycle: Lifecycle) ->
-        LifecycleManager(get(), lifecycle)
+        LifecycleManager(arrayOf(get(Camera), get(Flash)), lifecycle)
         Unit
     }
 }
@@ -41,15 +44,15 @@ val viewModelModule = module {
 }
 
 val useCaseModule = module {
-    single { FlashOffUseCase(get()) }
-    single { FlashOnUseCase(get()) }
+    single { FlashOffUseCase(get(Flash)) }
+    single { FlashOnUseCase(get(Flash)) }
     single { TakePreviewImageUseCase(get()) }
     single { SwitchCameraUseCase(get()) }
     single { TakePictureImageUseCase(get()) }
 }
 
 val cameraModule = module {
-    single<ICamera> { CameraImp(get(), get(), get()) }
+    single<ICamera> { CameraImp(get(Camera), get(Camera), get()) }
 
     single {
         SurfaceView(androidContext()).apply {
@@ -61,7 +64,7 @@ val cameraModule = module {
         }
     }
 
-    single {
+    single(Camera) {
         NativeCameraManager(
             get(),
             get(),
@@ -77,7 +80,7 @@ val cameraModule = module {
         ILifecycleObserver::class
     )
 
-    single { CameraRotationUtil(get(), get(), get()) }
+    single { CameraRotationUtil(get(), get(Camera), get()) }
 
     single { CameraSide.BACK }
 
@@ -87,7 +90,7 @@ val cameraModule = module {
 }
 
 val flashModule = module {
-    single<IFlash> { FlashImp(get()) }
+    single<IFlash>(Flash) { FlashImp(get(Camera)) } bind ILifecycleObserver::class
 }
 
 val scheduleModule = module {
