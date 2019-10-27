@@ -24,26 +24,25 @@ class FlashImp(private val camera: INativeCamera) : IFlash, ILifecycleObserver {
     }
 
     override fun start() {
-        if(flashState) {
+        if (flashState) {
             action(true)
         }
     }
 
     override fun stop() {
-        if(flashState) {
+        if (flashState) {
             action(false)
         }
     }
 
-    override fun destroy() {
-        flashState = false
-    }
-
     private fun action(flashState: Boolean) {
         camera.camera().run {
-            parameters = parameters.apply {
-                flashMode =
-                    if (flashState) Camera.Parameters.FLASH_MODE_TORCH else Camera.Parameters.FLASH_MODE_OFF
+            try {
+                parameters = parameters.apply {
+                    flashMode =
+                        if (flashState) Camera.Parameters.FLASH_MODE_TORCH else Camera.Parameters.FLASH_MODE_OFF
+                }
+            } catch (e: RuntimeException) {
             }
         }
     }

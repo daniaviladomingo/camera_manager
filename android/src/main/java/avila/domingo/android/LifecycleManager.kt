@@ -21,9 +21,4 @@ class LifecycleManager(
     fun stop() {
         lifecycleObserver.forEach { it.stop() }
     }
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-    fun destroy() {
-        lifecycleObserver.forEach { it.destroy() }
-    }
 }

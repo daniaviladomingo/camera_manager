@@ -186,13 +186,7 @@ class NativeCameraManager(
     }
 
     override fun stop() {
-        currentCamera.stopPreview()
-    }
-
-    override fun destroy() {
         surfaceView.holder.removeCallback(surfaceHolderCallback)
         currentCamera.stopPreview()
-        currentCamera.release()
-        currentCameraSide = initialCameraSide
     }
 }
