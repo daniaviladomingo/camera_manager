@@ -4,7 +4,6 @@ import android.Manifest
 import android.os.Bundle
 import android.view.SurfaceView
 import androidx.lifecycle.Observer
-import avila.domingo.android.LifecycleManager
 import avila.domingo.cameramanager.R
 import avila.domingo.cameramanager.base.BaseActivity
 import avila.domingo.cameramanager.ui.data.ResourceState

@@ -1,4 +1,4 @@
-package avila.domingo.android
+package avila.domingo.lifecycle
 
 interface ILifecycleObserver {
     fun start()

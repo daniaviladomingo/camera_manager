@@ -3,12 +3,13 @@
 package avila.domingo.flash
 
 import android.hardware.Camera
-import avila.domingo.android.ILifecycleObserver
+import avila.domingo.lifecycle.ILifecycleObserver
 import avila.domingo.camera.INativeCamera
 import avila.domingo.domain.IFlash
 import io.reactivex.Completable
 
-class FlashImp(private val camera: INativeCamera) : IFlash, ILifecycleObserver {
+class FlashImp(private val camera: INativeCamera) : IFlash,
+    ILifecycleObserver {
     private var flashState = false
     override fun on(): Completable = Completable.create {
         action(true)

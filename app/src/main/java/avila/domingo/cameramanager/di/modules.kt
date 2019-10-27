@@ -5,8 +5,8 @@ import android.view.SurfaceView
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.lifecycle.Lifecycle
-import avila.domingo.android.ILifecycleObserver
-import avila.domingo.android.LifecycleManager
+import avila.domingo.lifecycle.ILifecycleObserver
+import avila.domingo.lifecycle.LifecycleManager
 import avila.domingo.camera.*
 import avila.domingo.camera.model.mapper.CameraSideMapper
 import avila.domingo.cameramanager.di.qualifiers.Camera

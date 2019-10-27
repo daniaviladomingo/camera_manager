@@ -1,4 +1,4 @@
-package avila.domingo.android
+package avila.domingo.lifecycle
 
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver

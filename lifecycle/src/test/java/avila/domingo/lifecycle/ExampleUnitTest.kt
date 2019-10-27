@@ -1,4 +1,4 @@
-package avila.domingo.android
+package avila.domingo.lifecycle
 
 import org.junit.Test
 

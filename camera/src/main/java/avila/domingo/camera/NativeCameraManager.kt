@@ -8,7 +8,7 @@ import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.WindowManager
-import avila.domingo.android.ILifecycleObserver
+import avila.domingo.lifecycle.ILifecycleObserver
 import avila.domingo.camera.model.mapper.CameraSideMapper
 import avila.domingo.domain.model.CameraSide
 import kotlin.math.abs
@@ -19,7 +19,7 @@ class NativeCameraManager(
     private val rangePreview: IntRange,
     private val rangePicture: IntRange,
     private val surfaceView: SurfaceView,
-    private val initialCameraSide: CameraSide
+    initialCameraSide: CameraSide
 ) : INativeCamera, ISwitchCamera, ICameraSide, ILifecycleObserver {
 
     private lateinit var currentCamera: Camera
