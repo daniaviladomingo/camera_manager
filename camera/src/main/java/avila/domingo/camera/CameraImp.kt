@@ -2,7 +2,10 @@
 
 package avila.domingo.camera
 
+import avila.domingo.camera.cameranative.INativeCamera
+import avila.domingo.camera.model.mapper.CameraSideMapper
 import avila.domingo.domain.ICamera
+import avila.domingo.domain.model.CameraSide
 import avila.domingo.domain.model.Image
 import avila.domingo.domain.model.ImageFormat
 import io.reactivex.Completable
@@ -10,8 +13,7 @@ import io.reactivex.Single
 
 class CameraImp(
     private val nativeCamera: INativeCamera,
-    private val switchCamera: ISwitchCamera,
-    private val cameraRotationUtil: CameraRotationUtil
+    private val cameraSideMapper: CameraSideMapper
 ) : ICamera {
     override fun takePreview(): Single<Image> = Single.create {
         nativeCamera.camera().setOneShotPreviewCallback { data, camera ->
@@ -22,7 +24,7 @@ class CameraImp(
                     data,
                     previewSize.width,
                     previewSize.height,
-                    cameraRotationUtil.rotationDegrees()
+                    nativeCamera.rotationDegrees()
                 )
             )
         }
@@ -38,14 +40,18 @@ class CameraImp(
                     data,
                     pictureSize.width,
                     pictureSize.height,
-                    cameraRotationUtil.rotationDegrees()
+                    nativeCamera.rotationDegrees()
                 )
             )
         })
     }
 
-    override fun switchCamera(): Completable = Completable.create {
-        switchCamera.switch()
+    override fun switch(cameraSide: CameraSide): Completable = Completable.create {
+        nativeCamera.switch(cameraSideMapper.map(cameraSide))
         it.onComplete()
+    }
+
+    override fun side(): Single<CameraSide> = Single.create {
+        it.onSuccess(cameraSideMapper.inverseMap(nativeCamera.cameraId()))
     }
 }

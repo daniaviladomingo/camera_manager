@@ -29,28 +29,12 @@ class MainActivity : BaseActivity() {
 
         lifecycleObserver.run { }
 
-        take_picture.setOnClickListener {
-            mainActivityViewModel.takePicture()
-        }
+        take_picture.setOnClickListener { mainActivityViewModel.takePicture() }
 
-        take_preview.setOnClickListener {
-            mainActivityViewModel.takePreview()
-        }
-
-        switch_camera.setOnClickListener {
-            mainActivityViewModel.switchCamera()
-        }
-
-        flash_on.setOnClickListener {
-            mainActivityViewModel.flashOn()
-        }
-
-        flash_off.setOnClickListener {
-            mainActivityViewModel.flashOff()
-        }
+        take_preview.setOnClickListener { mainActivityViewModel.takePreview() }
 
         if (isPermissionGranted(Manifest.permission.CAMERA)) {
-            setListener()
+            init()
         } else {
             requestPermission(Manifest.permission.CAMERA, requestCodeCamera)
         }
@@ -66,7 +50,41 @@ class MainActivity : BaseActivity() {
         surface_view.removeView(surfaceView)
     }
 
+    private fun init() {
+        setListener()
+        updateState()
+    }
+
+    private fun updateState() {
+        mainActivityViewModel.getCameraSide()
+        mainActivityViewModel.getFlashMode()
+    }
+
     private fun setListener() {
+        mainActivityViewModel.cameraSideLiveData.observe(this, Observer { resource ->
+            resource?.run {
+                managementResourceState(status, message)
+                if (status == ResourceState.SUCCESS) {
+                    data?.run {
+                        switch_camera.isChecked = this
+                        switch_camera.setOnCheckedChangeListener { _, b -> mainActivityViewModel.switchCamera(b) }
+                    }
+                }
+            }
+        })
+
+        mainActivityViewModel.flashModeLiveData.observe(this, Observer { resource ->
+            resource?.run {
+                managementResourceState(status, message)
+                if (status == ResourceState.SUCCESS) {
+                    data?.run {
+                        switch_flash.isChecked = this
+                        switch_flash.setOnCheckedChangeListener { _, b -> mainActivityViewModel.flashMode(b) }
+                    }
+                }
+            }
+        })
+
         mainActivityViewModel.flashLiveData.observe(this, Observer { resource ->
             resource?.run {
                 managementResourceState(status, message)
@@ -100,7 +118,7 @@ class MainActivity : BaseActivity() {
         when (requestCode) {
             requestCodeCamera -> {
                 if (grantResults.isPermissionsGranted()) {
-                    setListener()
+                    init()
                 } else {
                     finish()
                 }

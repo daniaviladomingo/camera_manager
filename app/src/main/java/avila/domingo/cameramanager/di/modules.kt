@@ -1,58 +1,80 @@
 package avila.domingo.cameramanager.di
 
 import android.content.Context
+import android.graphics.Point
+import android.view.Display
 import android.view.SurfaceView
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.lifecycle.Lifecycle
-import avila.domingo.lifecycle.ILifecycleObserver
-import avila.domingo.lifecycle.LifecycleManager
 import avila.domingo.camera.*
+import avila.domingo.camera.cameranative.INativeCamera
+import avila.domingo.camera.cameranative.INativeFlash
+import avila.domingo.camera.cameranative.NativeCameraManager
+import avila.domingo.camera.model.ScreenSize
 import avila.domingo.camera.model.mapper.CameraSideMapper
-import avila.domingo.cameramanager.di.qualifiers.Camera
-import avila.domingo.cameramanager.di.qualifiers.Flash
+import avila.domingo.camera.util.CameraRotationUtil
+import avila.domingo.cameramanager.di.qualifiers.CameraId
 import avila.domingo.cameramanager.di.qualifiers.RangeForPicture
 import avila.domingo.cameramanager.di.qualifiers.RangeForPreview
 import avila.domingo.cameramanager.model.mapper.ImageMapper
+import avila.domingo.cameramanager.model.mapper.UiCameraSideMapper
+import avila.domingo.cameramanager.model.mapper.UiFlashModeMapper
 import avila.domingo.cameramanager.schedulers.IScheduleProvider
 import avila.domingo.cameramanager.schedulers.ScheduleProviderImp
 import avila.domingo.cameramanager.ui.MainActivityViewModel
 import avila.domingo.domain.ICamera
 import avila.domingo.domain.IFlash
 import avila.domingo.domain.interactor.*
-import avila.domingo.domain.model.CameraSide
 import avila.domingo.flash.FlashImp
+import avila.domingo.flash.model.mapper.FlashModeMapper
+import avila.domingo.lifecycle.ILifecycleObserver
+import avila.domingo.lifecycle.LifecycleManager
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.dsl.bind
 import org.koin.dsl.binds
 import org.koin.dsl.module
 
 val appModule = module {
-    single { androidContext().getSystemService(Context.WINDOW_SERVICE) as WindowManager }
+    single { (androidContext().getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay }
 }
 
 val activityModule = module {
     factory { (lifecycle: Lifecycle) ->
-        LifecycleManager(arrayOf(get(Camera), get(Flash)), lifecycle)
+        LifecycleManager(arrayOf(get()), lifecycle)
         Unit
     }
 }
 
 val viewModelModule = module {
-    viewModel { MainActivityViewModel(get(), get(), get(), get(), get(), get(), get()) }
+    viewModel {
+        MainActivityViewModel(
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get()
+        )
+    }
 }
 
 val useCaseModule = module {
-    single { FlashOffUseCase(get(Flash)) }
-    single { FlashOnUseCase(get(Flash)) }
+    single { SetFlashModeUseCase(get()) }
+    single { GetFlashModeUseCase(get()) }
     single { TakePreviewImageUseCase(get()) }
-    single { SwitchCameraUseCase(get()) }
     single { TakePictureImageUseCase(get()) }
+    single { SwitchCameraUseCase(get()) }
+    single { GetCameraSideUseCase(get()) }
 }
 
+@Suppress("DEPRECATION")
 val cameraModule = module {
-    single<ICamera> { CameraImp(get(Camera), get(Camera), get()) }
+    single<ICamera> { CameraImp(get(), get()) }
 
     single {
         SurfaceView(androidContext()).apply {
@@ -64,33 +86,45 @@ val cameraModule = module {
         }
     }
 
-    single(Camera) {
+    single {
         NativeCameraManager(
-            get(),
             get(),
             get(RangeForPreview),
             get(RangeForPicture),
             get(),
+            get(),
+            get(CameraId),
             get()
         )
     } binds arrayOf(
-        ICameraSide::class,
         INativeCamera::class,
-        ISwitchCamera::class,
+        INativeFlash::class,
         ILifecycleObserver::class
     )
 
-    single { CameraRotationUtil(get(), get(Camera), get()) }
+    single { CameraRotationUtil(get()) }
 
-    single { CameraSide.BACK }
+    factory {
+        Point().apply { (get() as Display).getSize(this) }.let { point ->
+            if (point.x > point.y) {
+                ScreenSize(point.x, point.y)
+            } else {
+                ScreenSize(point.y, point.x)
+            }
+        }
+    }
 
     single(RangeForPicture) { 640..2160 }
 
     single(RangeForPreview) { 640..2160 }
+
+    single(CameraId) { android.hardware.Camera.CameraInfo.CAMERA_FACING_BACK }
+
+    single { android.hardware.Camera.Parameters.FLASH_MODE_OFF }
 }
 
 val flashModule = module {
-    single<IFlash>(Flash) { FlashImp(get(Camera)) } bind ILifecycleObserver::class
+    single<IFlash> { FlashImp(get(), get()) }
 }
 
 val scheduleModule = module {
@@ -99,5 +133,8 @@ val scheduleModule = module {
 
 val mapperModule = module {
     single { CameraSideMapper() }
+    single { UiCameraSideMapper() }
+    single { FlashModeMapper() }
+    single { UiFlashModeMapper() }
     single { ImageMapper() }
 }

@@ -1,29 +1,28 @@
 @file:Suppress("DEPRECATION")
 
-package avila.domingo.camera
+package avila.domingo.camera.cameranative
 
-import android.graphics.Point
 import android.hardware.Camera
-import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.SurfaceView
-import android.view.WindowManager
+import avila.domingo.camera.util.CameraRotationUtil
+import avila.domingo.camera.model.ScreenSize
 import avila.domingo.lifecycle.ILifecycleObserver
-import avila.domingo.camera.model.mapper.CameraSideMapper
-import avila.domingo.domain.model.CameraSide
 import kotlin.math.abs
 
 class NativeCameraManager(
-    private val cameraSideMapper: CameraSideMapper,
-    private val windowManager: WindowManager,
+    private val screenSize: ScreenSize,
     private val rangePreview: IntRange,
     private val rangePicture: IntRange,
     private val surfaceView: SurfaceView,
-    initialCameraSide: CameraSide
-) : INativeCamera, ISwitchCamera, ICameraSide, ILifecycleObserver {
+    private val cameraRotationUtil: CameraRotationUtil,
+    cameraId: Int,
+    flashMode: String
+) : INativeCamera, INativeFlash, ILifecycleObserver {
 
     private lateinit var currentCamera: Camera
-    private var currentCameraSide = initialCameraSide
+    private var currentCameraId = cameraId
+    private var currentFlashMode = flashMode
 
     private val surfaceHolderCallback = object : SurfaceHolder.Callback {
         override fun surfaceChanged(
@@ -41,35 +40,40 @@ class NativeCameraManager(
         }
     }
 
-    override fun switch() {
-        currentCamera.release()
-        openCamera(when (currentCameraSide) {
-            CameraSide.BACK -> CameraSide.FRONT
-            CameraSide.FRONT -> CameraSide.BACK
-        }.apply {
-            currentCameraSide = this
-        })
-        currentCamera.run {
-            startPreview()
-            setPreviewDisplay(surfaceView.holder)
+    override fun mode(mode: String) {
+        currentCamera.parameters = currentCamera.parameters.apply {
+            if (supportedFlashModes?.contains(mode) == true) {
+                flashMode = mode
+            }
+        }
+        currentFlashMode = mode
+    }
+
+    override fun mode(): String = currentFlashMode
+
+    override fun switch(cameraId: Int) {
+        if (cameraId != currentCameraId) {
+            currentCameraId = cameraId
+            currentCamera.release()
+            openCamera(currentCameraId)
+            currentCamera.setPreviewDisplay(surfaceView.holder)
+            currentCamera.startPreview()
         }
     }
 
-    override fun cameraSide(): CameraSide = currentCameraSide
-
     override fun camera(): Camera = currentCamera
 
-    private fun openCamera(cameraSide: CameraSide) {
-        currentCamera = Camera.open(cameraSideMapper.map(cameraSide))
+    override fun cameraId(): Int = currentCameraId
+
+    override fun rotationDegrees(): Int = cameraRotationUtil.rotationDegreesImage(currentCameraId)
+
+    private fun openCamera(cameraId: Int) {
+        currentCamera = Camera.open(cameraId)
         configure()
-        currentCameraSide = cameraSide
     }
 
     private fun configure() {
         currentCamera.run {
-
-            val screenSize = screenSize()
-
             val customParameters = parameters
             customParameters.supportedFocusModes.run {
                 when {
@@ -142,47 +146,20 @@ class NativeCameraManager(
                     }
                 }
 
+            customParameters.flashMode = currentFlashMode
+
             parameters = customParameters
 
-            setDisplayOrientation(getCameraDisplayOrientation())
+            setDisplayOrientation(cameraRotationUtil.rotationDegreesPreview(currentCameraId))
         }
     }
-
-    private fun getCameraDisplayOrientation(): Int {
-        val info = Camera.CameraInfo()
-        Camera.getCameraInfo(cameraSideMapper.map(currentCameraSide), info)
-
-        val degrees = when (windowManager.defaultDisplay.rotation) {
-            Surface.ROTATION_0 -> 0
-            Surface.ROTATION_90 -> 90
-            Surface.ROTATION_180 -> 180
-            Surface.ROTATION_270 -> 270
-            else -> 0
-        }
-
-        return if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-            (360 - (info.orientation + degrees) % 360) % 360  // compensate the mirror
-        } else {  // back-facing
-            (info.orientation - degrees + 360) % 360
-        }
-    }
-
-    private fun screenSize(): Size =
-        Point().apply { windowManager.defaultDisplay.getSize(this) }.let { point ->
-            if (point.x > point.y) {
-                Size(point.x, point.y)
-            } else {
-                Size(point.y, point.x)
-            }
-        }
-
-    internal data class Size(val witdh: Int, val height: Int)
 
     override fun start() {
         surfaceView.holder.addCallback(surfaceHolderCallback)
-        openCamera(currentCameraSide)
+        openCamera(currentCameraId)
         currentCamera.setPreviewDisplay(surfaceView.holder)
         currentCamera.startPreview()
+
     }
 
     override fun stop() {

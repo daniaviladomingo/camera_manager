@@ -2,49 +2,23 @@
 
 package avila.domingo.flash
 
-import android.hardware.Camera
-import avila.domingo.lifecycle.ILifecycleObserver
-import avila.domingo.camera.INativeCamera
+import avila.domingo.camera.cameranative.INativeFlash
 import avila.domingo.domain.IFlash
+import avila.domingo.domain.model.FlashMode
+import avila.domingo.flash.model.mapper.FlashModeMapper
 import io.reactivex.Completable
+import io.reactivex.Single
 
-class FlashImp(private val camera: INativeCamera) : IFlash,
-    ILifecycleObserver {
-    private var flashState = false
-    override fun on(): Completable = Completable.create {
-        action(true)
+class FlashImp(
+    private val nativeFlash: INativeFlash,
+    private val flashModeMapper: FlashModeMapper
+) : IFlash {
+    override fun mode(mode: FlashMode): Completable = Completable.create {
+        nativeFlash.mode(flashModeMapper.map(mode))
         it.onComplete()
-        flashState = true
-
     }
 
-    override fun off(): Completable = Completable.create {
-        action(false)
-        it.onComplete()
-        flashState = false
-    }
-
-    override fun start() {
-        if (flashState) {
-            action(true)
-        }
-    }
-
-    override fun stop() {
-        if (flashState) {
-            action(false)
-        }
-    }
-
-    private fun action(flashState: Boolean) {
-        camera.camera().run {
-            try {
-                parameters = parameters.apply {
-                    flashMode =
-                        if (flashState) Camera.Parameters.FLASH_MODE_TORCH else Camera.Parameters.FLASH_MODE_OFF
-                }
-            } catch (e: RuntimeException) {
-            }
-        }
+    override fun mode(): Single<FlashMode> = Single.create {
+        it.onSuccess(flashModeMapper.inverseMap(nativeFlash.mode()))
     }
 }

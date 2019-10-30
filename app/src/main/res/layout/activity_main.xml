@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -9,69 +9,88 @@
     <FrameLayout
             android:id="@+id/surface_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent" />
 
     <ImageView
-            android:contentDescription="@null"
             android:id="@+id/image"
-            android:layout_centerInParent="true"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:contentDescription="@null" />
 
     <LinearLayout
-            android:layout_margin="2dp"
-            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_margin="2dp"
+            android:orientation="vertical">
 
         <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
             <Button
                     android:id="@+id/take_picture"
-                    android:text="Take picture"
                     android:layout_width="0dp"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:layout_height="match_parent"/>
-
-            <Button
-                    android:id="@+id/switch_camera"
-                    android:text="Switch Camera"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="match_parent"/>
+                    android:text="Take picture" />
 
             <Button
                     android:id="@+id/take_preview"
-                    android:text="Take preview"
                     android:layout_width="0dp"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:layout_height="match_parent"/>
+                    android:text="Take preview" />
 
         </LinearLayout>
 
+
         <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
 
-            <Button
-                    android:id="@+id/flash_on"
-                    android:text="FLASH ON"
+            <LinearLayout
                     android:layout_width="0dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_height="match_parent"/>
+                    android:gravity="center_horizontal"
+                    android:orientation="horizontal">
 
-            <Button
-                    android:id="@+id/flash_off"
-                    android:text="FLASH OFF"
+                <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/switch_camera"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/white"
+                        android:textOff="FRONT"
+                        android:textOn="BACK"
+                        android:textStyle="bold"
+                        app:showText="true" />
+
+            </LinearLayout>
+
+            <LinearLayout
                     android:layout_width="0dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_height="match_parent"/>
+                    android:gravity="center_horizontal"
+                    android:orientation="horizontal">
+
+                <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/switch_flash"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/white"
+                        android:textOff="OFF"
+                        android:textOn="ON"
+                        android:textStyle="bold"
+                        app:showText="true" />
+
+            </LinearLayout>
         </LinearLayout>
 
     </LinearLayout>

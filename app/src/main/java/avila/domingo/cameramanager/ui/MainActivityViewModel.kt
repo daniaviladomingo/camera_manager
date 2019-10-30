@@ -2,26 +2,55 @@ package avila.domingo.cameramanager.ui
 
 import android.graphics.Bitmap
 import avila.domingo.cameramanager.base.BaseViewModel
-import avila.domingo.cameramanager.di.activityModule
 import avila.domingo.cameramanager.model.mapper.ImageMapper
+import avila.domingo.cameramanager.model.mapper.UiCameraSideMapper
+import avila.domingo.cameramanager.model.mapper.UiFlashModeMapper
 import avila.domingo.cameramanager.schedulers.IScheduleProvider
 import avila.domingo.cameramanager.ui.data.Resource
 import avila.domingo.cameramanager.util.SingleLiveEvent
 import avila.domingo.domain.interactor.*
 
 class MainActivityViewModel(
-    private val flashOnUseCase: FlashOnUseCase,
-    private val flashOffUseCase: FlashOffUseCase,
+    private val setFlashModeUseCase: SetFlashModeUseCase,
+    private val getFlashModeUseCase: GetFlashModeUseCase,
     private val takePictureImageUseCase: TakePictureImageUseCase,
     private val takePreviewImageUseCase: TakePreviewImageUseCase,
     private val switchCameraUseCase: SwitchCameraUseCase,
+    private val getCameraSideUseCase: GetCameraSideUseCase,
     private val imageMapper: ImageMapper,
+    private val flashModeMapper: UiFlashModeMapper,
+    private val cameraSideMapper: UiCameraSideMapper,
     private val scheduleProvider: IScheduleProvider
 ) : BaseViewModel() {
+
+    val flashModeLiveData = SingleLiveEvent<Resource<Boolean>>()
+    val cameraSideLiveData = SingleLiveEvent<Resource<Boolean>>()
 
     val takeImageLiveData = SingleLiveEvent<Resource<Bitmap>>()
     val switchCameraLiveData = SingleLiveEvent<Resource<Any?>>()
     val flashLiveData = SingleLiveEvent<Resource<Any?>>()
+
+    fun getFlashMode() {
+        addDisposable(getFlashModeUseCase.execute()
+            .observeOn(scheduleProvider.ui())
+            .subscribeOn(scheduleProvider.computation())
+            .subscribe({ mode ->
+                flashModeLiveData.value = Resource.success(flashModeMapper.inverseMap(mode))
+            }) {
+                flashModeLiveData.value = Resource.error(it.localizedMessage)
+            })
+    }
+
+    fun getCameraSide() {
+        addDisposable(getCameraSideUseCase.execute()
+            .observeOn(scheduleProvider.ui())
+            .subscribeOn(scheduleProvider.computation())
+            .subscribe({ side ->
+                cameraSideLiveData.value = Resource.success(cameraSideMapper.inverseMap(side))
+            }) {
+                cameraSideLiveData.value = Resource.error(it.localizedMessage)
+            })
+    }
 
     fun takePicture() {
         addDisposable(takePictureImageUseCase.execute()
@@ -45,8 +74,8 @@ class MainActivityViewModel(
             })
     }
 
-    fun switchCamera() {
-        addDisposable(switchCameraUseCase.execute()
+    fun switchCamera(back: Boolean) {
+        addDisposable(switchCameraUseCase.execute(cameraSideMapper.map(back))
             .observeOn(scheduleProvider.ui())
             .subscribeOn(scheduleProvider.computation())
             .subscribe({
@@ -56,19 +85,8 @@ class MainActivityViewModel(
             })
     }
 
-    fun flashOn() {
-        addDisposable(flashOnUseCase.execute()
-            .observeOn(scheduleProvider.ui())
-            .subscribeOn(scheduleProvider.computation())
-            .subscribe({
-                flashLiveData.value = Resource.success(null)
-            }) {
-                flashLiveData.value = Resource.error(it.localizedMessage)
-            })
-    }
-
-    fun flashOff() {
-        addDisposable(flashOffUseCase.execute()
+    fun flashMode(on: Boolean) {
+        addDisposable(setFlashModeUseCase.execute(flashModeMapper.map(on))
             .observeOn(scheduleProvider.ui())
             .subscribeOn(scheduleProvider.computation())
             .subscribe({
