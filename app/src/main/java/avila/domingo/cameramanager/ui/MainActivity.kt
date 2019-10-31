@@ -27,8 +27,6 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        lifecycleObserver.run { }
-
         take_picture.setOnClickListener { mainActivityViewModel.takePicture() }
 
         take_preview.setOnClickListener { mainActivityViewModel.takePreview() }
@@ -51,6 +49,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun init() {
+        lifecycleObserver.run { }
         setListener()
         updateState()
     }
