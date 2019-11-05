@@ -31,6 +31,7 @@ class MainActivityViewModel(
     val flashLiveData = SingleLiveEvent<Resource<Any?>>()
 
     fun getFlashMode() {
+        flashModeLiveData.value = Resource.loading()
         addDisposable(getFlashModeUseCase.execute()
             .observeOn(scheduleProvider.ui())
             .subscribeOn(scheduleProvider.computation())
@@ -42,6 +43,7 @@ class MainActivityViewModel(
     }
 
     fun getCameraSide() {
+        cameraSideLiveData.value = Resource.loading()
         addDisposable(getCameraSideUseCase.execute()
             .observeOn(scheduleProvider.ui())
             .subscribeOn(scheduleProvider.computation())
@@ -53,6 +55,7 @@ class MainActivityViewModel(
     }
 
     fun takePicture() {
+        takeImageLiveData.value = Resource.loading()
         addDisposable(takePictureImageUseCase.execute()
             .observeOn(scheduleProvider.ui())
             .subscribeOn(scheduleProvider.computation())
@@ -64,6 +67,7 @@ class MainActivityViewModel(
     }
 
     fun takePreview() {
+        takeImageLiveData.value = Resource.loading()
         addDisposable(takePreviewImageUseCase.execute()
             .observeOn(scheduleProvider.ui())
             .subscribeOn(scheduleProvider.computation())
@@ -75,6 +79,7 @@ class MainActivityViewModel(
     }
 
     fun switchCamera(back: Boolean) {
+        switchCameraLiveData.value = Resource.loading()
         addDisposable(switchCameraUseCase.execute(cameraSideMapper.map(back))
             .observeOn(scheduleProvider.ui())
             .subscribeOn(scheduleProvider.computation())
@@ -86,6 +91,7 @@ class MainActivityViewModel(
     }
 
     fun flashMode(on: Boolean) {
+        flashLiveData.value = Resource.loading()
         addDisposable(setFlashModeUseCase.execute(flashModeMapper.map(on))
             .observeOn(scheduleProvider.ui())
             .subscribeOn(scheduleProvider.computation())

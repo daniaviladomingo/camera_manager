@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package avila.domingo.camera.cameranative
 
 import android.hardware.Camera

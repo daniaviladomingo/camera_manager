@@ -85,8 +85,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@android:color/white"
-                        android:textOff="OFF"
-                        android:textOn="ON"
+                        android:textOff="F. OFF"
+                        android:textOn="F. ON"
                         android:textStyle="bold"
                         app:showText="true" />
 
