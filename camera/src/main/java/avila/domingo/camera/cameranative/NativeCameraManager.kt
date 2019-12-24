@@ -65,7 +65,7 @@ class NativeCameraManager(
 
     override fun cameraId(): Int = currentCameraId
 
-    override fun rotationDegrees(): Int = cameraRotationUtil.rotationDegreesImage(currentCameraId)
+    override fun rotationDegrees(): Int = cameraRotationUtil.rotationDegrees(currentCameraId)
 
     private fun openCamera(cameraId: Int) {
         currentCamera = Camera.open(cameraId)
@@ -150,7 +150,7 @@ class NativeCameraManager(
 
             parameters = customParameters
 
-            setDisplayOrientation(cameraRotationUtil.rotationDegreesPreview(currentCameraId))
+            setDisplayOrientation(cameraRotationUtil.rotationDegrees(currentCameraId))
         }
     }
 
