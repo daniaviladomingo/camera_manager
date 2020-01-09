@@ -3,10 +3,12 @@
 package avila.domingo.camera.cameranative
 
 import android.hardware.Camera
+import android.util.Log
+import android.util.Size
 import android.view.SurfaceHolder
 import android.view.SurfaceView
-import avila.domingo.camera.util.CameraRotationUtil
 import avila.domingo.camera.model.ScreenSize
+import avila.domingo.camera.util.CameraRotationUtil
 import avila.domingo.lifecycle.ILifecycleObserver
 import kotlin.math.abs
 
@@ -23,6 +25,7 @@ class NativeCameraManager(
     private lateinit var currentCamera: Camera
     private var currentCameraId = cameraId
     private var currentFlashMode = flashMode
+    private var previewSize = Pair(0, 0)
 
     private val surfaceHolderCallback = object : SurfaceHolder.Callback {
         override fun surfaceChanged(
@@ -65,7 +68,9 @@ class NativeCameraManager(
 
     override fun cameraId(): Int = currentCameraId
 
-    override fun rotationDegrees(): Int = cameraRotationUtil.rotationDegrees(currentCameraId)
+    override fun rotationDegrees(): Int = cameraRotationUtil.rotationDegreesImage(currentCameraId)
+
+    override fun previewSize(): Pair<Int, Int> = previewSize
 
     private fun openCamera(cameraId: Int) {
         currentCamera = Camera.open(cameraId)
@@ -87,6 +92,9 @@ class NativeCameraManager(
             }
 
             val screenRatio = screenSize.witdh / screenSize.height.toFloat()
+
+            Log.d("fff", "Screen Ratio: $screenRatio")
+            Log.d("fff", "Screen size: ${screenSize.witdh} x ${screenSize.height}")
 
             var diff = Float.MAX_VALUE
             var previewWidth = 0
@@ -116,6 +124,12 @@ class NativeCameraManager(
                         customParameters.setPreviewSize(previewWidth, previewHeight)
                     }
                 }
+
+            customParameters.previewSize.run {
+                Log.d("fff", "Preview: ${this.width} x ${this.height}")
+                Log.d("fff", "Preview ratio: ${this.width / this.height.toFloat()}")
+                previewSize = Pair(this.width, this.height)
+            }
 
             diff = Float.MAX_VALUE
             previewWidth = 0
@@ -150,7 +164,7 @@ class NativeCameraManager(
 
             parameters = customParameters
 
-            setDisplayOrientation(cameraRotationUtil.rotationDegrees(currentCameraId))
+            setDisplayOrientation(cameraRotationUtil.rotationDegreesPreview(currentCameraId))
         }
     }
 

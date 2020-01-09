@@ -9,20 +9,18 @@ import android.view.Surface
 class CameraRotationUtil(
     private val display: Display
 ) {
-//    fun rotationDegreesPreview(cameraId: Int): Int {
-//        val cameraInfo = cameraInfo(cameraId)
-//        val degrees = degrees()
-//
-//        return if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-//            (360 - (cameraInfo.orientation + degrees) % 360) % 360
-//        } else {
-//            (cameraInfo.orientation - degrees + 360) % 360
-//        }.apply {
-//            Log.d("aaa", "Rotation preview: $this")
-//        }
-//    }
+    fun rotationDegreesPreview(cameraId: Int): Int {
+        val cameraInfo = cameraInfo(cameraId)
+        val degrees = degrees()
 
-    fun rotationDegrees(cameraId: Int): Int {
+        return if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            (360 - (cameraInfo.orientation + degrees) % 360) % 360
+        } else {
+            (cameraInfo.orientation - degrees + 360) % 360
+        }
+    }
+
+    fun rotationDegreesImage(cameraId: Int): Int {
         val cameraInfo = cameraInfo(cameraId)
         var degrees = degrees()
 
@@ -30,8 +28,7 @@ class CameraRotationUtil(
             degrees = 360 - degrees
         }
 
-
-        return ((cameraInfo.orientation + degrees) % 360)
+        return (cameraInfo.orientation + degrees) % 360
     }
 
     private fun cameraInfo(cameraId: Int): Camera.CameraInfo {
