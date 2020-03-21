@@ -25,7 +25,6 @@ class NativeCameraManager(
     private lateinit var currentCamera: Camera
     private var currentCameraId = cameraId
     private var currentFlashMode = flashMode
-    private var previewSize = Pair(0, 0)
 
     private val surfaceHolderCallback = object : SurfaceHolder.Callback {
         override fun surfaceChanged(
@@ -69,8 +68,6 @@ class NativeCameraManager(
     override fun cameraId(): Int = currentCameraId
 
     override fun rotationDegrees(): Int = cameraRotationUtil.rotationDegreesImage(currentCameraId)
-
-    override fun previewSize(): Pair<Int, Int> = previewSize
 
     private fun openCamera(cameraId: Int) {
         currentCamera = Camera.open(cameraId)
@@ -125,11 +122,11 @@ class NativeCameraManager(
                     }
                 }
 
-            customParameters.previewSize.run {
-                Log.d("fff", "Preview: ${this.width} x ${this.height}")
-                Log.d("fff", "Preview ratio: ${this.width / this.height.toFloat()}")
-                previewSize = Pair(this.width, this.height)
-            }
+//            customParameters.previewSize.run {
+//                Log.d("fff", "Preview: ${this.width} x ${this.height}")
+//                Log.d("fff", "Preview ratio: ${this.width / this.height.toFloat()}")
+//                previewSize = Pair(this.width, this.height)
+//            }
 
             diff = Float.MAX_VALUE
             previewWidth = 0
